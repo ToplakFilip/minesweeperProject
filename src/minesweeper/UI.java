@@ -1,82 +1,76 @@
 package minesweeper;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class UI {
 
-    static int minesFound;
-    static int fakeFound;
-
-    public UI(){
+    public UI() {
     }
 
-   static void start() {
+    static void start() {
 
         Scanner scan = new Scanner(System.in);
 
         System.out.println("[ HOW MANY MINES ON THE FIELD ? ]");
         int broj = Integer.parseInt(scan.nextLine());
         Board board = new Board();
-        String[][] field = board.createField(broj);
-        Board.Coordinates[] mineCoord = board.getMines();
-        int minesFound = 0;
-        int fakeFound = 0;
-        board.drawBoard(field);
+        board.createField(broj);
+        board.drawBoard();
 
         while (true) {
-            int[] part = coordinates(scan);
-            boolean mineNotThere = true;
-            if (field[part[1]][part[0]].matches("[1-9]")) {
-                System.out.println("[ A NUMBER IS PLACED THERE ! ]");
-            } else if (field[part[1]][part[0]].equals("-")) {
-                field[part[1]][part[0]] = "*";
-                int i = 0;
-                while (i < mineCoord.length) {
-                    if (mineCoord[i].getX() == part[1] && mineCoord[i].getY() == part[0]) {
-                        minesFound++;
-                        mineNotThere = false;
-                        break;
-                    }
-                    i++;
-                }
-                if (mineNotThere) {
-                    fakeFound++;
-                }
-                board.drawBoard(field);
-            } else if (field[part[1]][part[0]].equals("*")) {
-                field[part[1]][part[0]] = "-";
-
-                int i = 0;
-                while (i < mineCoord.length) {
-                    if (mineCoord[i].getX() == part[1] && mineCoord[i].getY() == part[0]) {
-                        minesFound--;
-                        mineNotThere = false;
-                        break;
-                    }
-                    i++;
-                }
-                if (mineNotThere) {
-                    fakeFound--;
-                }
-                board.drawBoard(field);
+            String[] part = moveInput(scan);
+            int x = Integer.parseInt(part[0]);
+            int y = Integer.parseInt(part[1]);
+            x--;
+            y--;
+            if (part[2].equals("mark")) {
+                board.mark(x, y);
             }
-            if (minesFound == mineCoord.length && fakeFound == 0) {
-                System.out.println("[ V I C T O R Y ]");
-                break;
+            if (part[2].equals("explore")) {
+                if (board.explore(x, y)) {
+                    board.gameOver();
+                    System.out.println("[ !!! G A M E  O V E R !!! ]");
+                    break;
+                }
+            }
+            if(board.winConditionCheck()){
+                System.out.println("[ !!! Y O U  W O N !!! ]");
             }
         }
     }
 
-    static private int[] coordinates(Scanner scan){
-        System.out.println("[ SET OR DELETE MINE MARKS COORDINATES (X Y) ]");
-        String coord = scan.nextLine();
-        int[] part = Arrays.stream(coord.split(" "))
-                .mapToInt(Integer::parseInt)
-                .toArray();
-        part[0]--;
-        part[1]--;
-        return part;
+    static private String[] moveInput(Scanner scan) {
+        while (true) {
+            System.out.println("[ ! MARK/REMOVE MARK OR EXPLORE A FIELD ! ]");
+            System.out.println("   [ TYPE: \"X Y mark\" OR \"X Y explore\" ]");
+            String coord = scan.nextLine();
+            String[] part = coord.split(" ");
+
+            if (errorChecker(part)) {
+                return part;
+            }
+
+        }
+    }
+
+    static boolean errorChecker(String[] part) {
+        if (part.length != 3) {
+            System.out.println("[ ! INPUT ERROR ! ]\n");
+            return false;
+        }
+        if (!part[0].matches("[1-9]") || !part[1].matches("[1-9]")) {
+            System.out.println("[ ! INPUT ERROR - WRONG COORDINATIONS ! ]\n");
+            return false;
+        }
+        if (Integer.parseInt(part[0]) > 9 || Integer.parseInt(part[1]) > 9) {
+            System.out.println("[ ! INPUT ERROR - WRONG COORDINATIONS ! ]\n");
+            return false;
+        }
+        if (!part[2].equals("mark") && !part[2].equals("explore")) {
+            System.out.println("[ ! INPUT ERROR - " + part[2] + " IS INVALID ACTION ! ]\n");
+            return false;
+        }
+        return true;
     }
 
 }
