@@ -4,15 +4,11 @@ import java.util.Scanner;
 
 public class UI {
 
-    public UI() {
-    }
-
     static void start() {
 
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("[ HOW MANY MINES ON THE FIELD ? ]");
-        int broj = Integer.parseInt(scan.nextLine());
+        int broj = howManyMines(scan);
         Board board = new Board();
         board.createField(broj);
         board.drawBoard();
@@ -34,6 +30,7 @@ public class UI {
                 }
             }
             if(board.winConditionCheck()){
+                board.drawBoard();
                 System.out.println("[ !!! Y O U  W O N !!! ]");
             }
         }
@@ -50,6 +47,25 @@ public class UI {
                 return part;
             }
 
+        }
+    }
+
+    static private int howManyMines(Scanner scan){
+        while(true){
+            System.out.println("[ HOW MANY MINES ON THE FIELD ? ]");
+            String input = scan.nextLine();
+            if(!input.matches("[1-9]||[1-9][1-9]")){
+                System.out.println("[ INPUT IS NOT A NUMBER ]");
+            } else {
+                int broj = Integer.parseInt(input);
+                if (broj > 80) {
+                    System.out.println("[ NUMBER TOO BIG ]");
+                } else if ( broj < 1){
+                    System.out.println("[ NUMBER TOO SMALL ]");
+                }else{
+                    return broj;
+                }
+            }
         }
     }
 

@@ -146,6 +146,8 @@ public class Board {
             System.out.println("   [ THAT FIELD IS EMPTY ! ]");
         } else if (playingField[y][x].equals("*")) {
             markremoval(x, y);
+            playingField[y][x] = numberedField[y][x];
+            drawBoard();
         } else if (playingField[y][x].equals("-")) {
             playingField[y][x] = "*";
 
@@ -169,9 +171,6 @@ public class Board {
             System.out.println("   [ THAT FIELD IS EMPTY ! ]");
         } else {
             openingFields(x, y);
-            System.out.println("BROJ PRAZNIH POLJA " + emptytiles);
-            System.out.println("BROJ KRIVIH POLJA " + fakeFound);
-            System.out.println("BROJ DOBRIH POLJA " + minesFound);
             drawBoard();
         }
         return false;
@@ -213,9 +212,23 @@ public class Board {
                 markremoval(x, y);
             }
             if (isInteger(playingField[y][x])) emptytiles++;
+
             playingField[y][x] = numberedField[y][x];
             emptytiles--;
             if (isInteger(numberedField[y][x])) {
+
+                if (y + 1 < playingField.length - 1 && playingField[y + 1][x].equals("-")) {
+                    playingField[y + 1][x] = numberedField[y + 1][x];
+                    if (numberedField[y + 1][x] == "/") {
+                        proxy(x, y + 1);
+                    }
+                }
+                if (y - 1 > 0 && playingField[y - 1][x].equals("-")) {
+                    playingField[y - 1][x] = numberedField[y - 1][x];
+                    if (numberedField[y - 1][x] == "/") {
+                        proxy(x, y - 1);
+                    }
+                }
                 break;
             }
 
@@ -231,12 +244,25 @@ public class Board {
                 markremoval(x, y);
             }
             if (isInteger(playingField[y][x])) emptytiles++;
+
             playingField[y][x] = numberedField[y][x];
             emptytiles--;
             if (playingField[y][x].equals("*")) {
                 markremoval(x, y);
             }
             if (isInteger(numberedField[y][x])) {
+                if (y + 1 < playingField.length - 1 && playingField[y + 1][x].equals("-")) {
+                    playingField[y + 1][x] = numberedField[y + 1][x];
+                    if (numberedField[y + 1][x] == "/") {
+                        proxy(x, y + 1);
+                    }
+                }
+                if (y - 1 > 0 && playingField[y - 1][x].equals("-")) {
+                    playingField[y - 1][x] = numberedField[y - 1][x];
+                    if (numberedField[y - 1][x] == "/") {
+                        proxy(x, y - 1);
+                    }
+                }
                 break;
             }
             proxy(x, y);
@@ -254,67 +280,95 @@ public class Board {
             playingField[y][x] = numberedField[y][x];
             emptytiles--;
             if (isInteger(numberedField[y][x])) {
-                break;
-            }
-            proxy(x, y);
-        }
-    }
 
-    private void goingDown(int x, int y) {
-        while (y < numberedField.length - 1) {
-            y++;
-            if (playingField[y][x].equals("/")) break;
-            if (playingField[y][x].equals("*")) {
-                markremoval(x, y);
-            }
-            if (isInteger(playingField[y][x])) emptytiles++;
-            playingField[y][x] = numberedField[y][x];
-            emptytiles--;
-            if (isInteger(numberedField[y][x])) {
-                break;
-            }
-            proxy(x, y);
-        }
-    }
+                if (x + 1 < playingField.length - 1 && playingField[y][x + 1].equals("-")) {
+                    playingField[y][x + 1] = numberedField[y][x + 1];
+                    if (numberedField[y][x + 1] == "/") {
+                        proxy(x + 1, y);
+                    }
+                }
+                    if (x - 1 > 0 && playingField[y][x - 1].equals("-")) {
+                        playingField[y][x - 1] = numberedField[y][x - 1];
+                        if (numberedField[y][x - 1] == "/") {
+                            proxy(x - 1, y);
+                        }
+                    }
 
-    public boolean binarySearch(Coordinates arr[], int x, int y) {
-        int l = 0, r = arr.length - 1;
-        while (l <= r) {
-            int m = l + (r - l) / 2;
-            if (arr[m].getX() == y) {
+                    break;
+                }
+                proxy(x, y);
+            }
+        }
+
+        private void goingDown ( int x, int y){
+            while (y < numberedField.length - 1) {
+                y++;
+                if (playingField[y][x].equals("/")) break;
+                if (playingField[y][x].equals("*")) {
+                    markremoval(x, y);
+                }
+                if (isInteger(playingField[y][x])) emptytiles++;
+                playingField[y][x] = numberedField[y][x];
+                emptytiles--;
+                if (isInteger(numberedField[y][x])) {
+
+                    if (x + 1 < playingField.length - 1 && playingField[y][x + 1].equals("-")) {
+                        playingField[y][x + 1] = numberedField[y][x + 1];
+                        if (numberedField[y][x + 1] == "/") {
+                            proxy(x + 1, y);
+                        }
+                    }
+                    if (x - 1 > 0 && playingField[y][x - 1].equals("-")) {
+                        playingField[y][x - 1] = numberedField[y][x - 1];
+                        if (numberedField[y][x - 1] == "/") {
+                            proxy(x - 1, y);
+                        }
+                    }
+
+                    break;
+                }
+                proxy(x, y);
+            }
+        }
+
+        public boolean binarySearch (Coordinates arr[],int x, int y){
+            int l = 0, r = arr.length - 1;
+            while (l <= r) {
+                int m = l + (r - l) / 2;
                 if (arr[m].getY() == x) {
-                    return true;
+                    if (arr[m].getX() == y) {
+                        return true;
+                    }
+                }
+                if (arr[m].getY() < x) {
+                    l = m + 1;
+                } else {
+                    r = m - 1;
                 }
             }
-            if (arr[m].getX() < y) {
-                l = m + 1;
+            return false;
+        }
+
+        private void markremoval ( int x, int y){
+            if (numberedField[y][x].equals("X")) {
+                minesFound--;
             } else {
-                r = m - 1;
+                fakeFound--;
             }
         }
-        return false;
-    }
 
-    private void markremoval(int x, int y) {
-        if (numberedField[y][x].equals("X")) {
-            minesFound--;
-        } else {
-            fakeFound--;
+        protected void gameOver () {
+            for (int i = 0; i < minePlacements.length; i++) {
+                playingField[minePlacements[i].getX()][minePlacements[i].getY()] = "X";
+            }
+            drawBoard();
+        }
+
+        protected boolean winConditionCheck () {
+            if (emptytiles == 0) return true;
+
+            if (fakeFound == 0 && minesFound == minePlacements.length) return true;
+
+            return false;
         }
     }
-
-    protected void gameOver() {
-        for (int i = 0; i < minePlacements.length; i++) {
-            playingField[minePlacements[i].getX()][minePlacements[i].getY()] = "X";
-        }
-        drawBoard();
-    }
-
-    protected boolean winConditionCheck(){
-        if(emptytiles == 0)return true;
-
-        if(fakeFound == 0 && minesFound == minePlacements.length) return true;
-
-        return false;
-    }
-}
