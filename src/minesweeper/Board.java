@@ -22,6 +22,7 @@ public class Board {
         int size = 9;
         this.playingField = new String[size][size];
         this.numberedField = new String[size][size];
+        this.minePlacements = new Coordinates[mines];
         emptytiles = size * size;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -136,19 +137,17 @@ public class Board {
             drawBoard();
         } else if (playingField[y][x].equals("-")) {
             playingField[y][x] = "*";
-
             if (numberedField[y][x].equals("X")) {
                 minesFound++;
             } else {
                 fakeFound++;
             }
-
             drawBoard();
         }
     }
 
     protected boolean explore(int x, int y) {
-        if(firstMove){
+        if (firstMove) {
             firstMove = false;
             firstExplore(x, y);
         }
@@ -193,11 +192,11 @@ public class Board {
         goingRight(Xc, Yc);
     }
 
-    private void cornerCasesForY(int x, int y){
+    private void cornerCasesForY(int x, int y) {
         if (y + 1 < playingField.length - 1 && playingField[y + 1][x].matches("[-]|[*]")) {
             playingField[y + 1][x] = numberedField[y + 1][x];
             emptytiles--;
-            if(numberedField[y + 1][x].equals("*")){
+            if (numberedField[y + 1][x].equals("*")) {
                 markremoval(x, y);
             }
             if (numberedField[y + 1][x].equals("/")) {
@@ -207,21 +206,21 @@ public class Board {
         if (y - 1 > 0 && playingField[y - 1][x].matches("[-]|[*]")) {
             playingField[y - 1][x] = numberedField[y - 1][x];
             emptytiles--;
-            if(numberedField[y - 1][x].equals("*")){
+            if (numberedField[y - 1][x].equals("*")) {
                 markremoval(x, y);
             }
             if (numberedField[y - 1][x].equals("/")) {
                 proxy(x, y - 1);
             }
         }
-
     }
-    private void cornerCasesforX(int x, int y){
+
+    private void cornerCasesForX(int x, int y) {
 
         if (x + 1 < playingField.length - 1 && playingField[y][x + 1].matches("[-]|[*]")) {
             playingField[y][x + 1] = numberedField[y][x + 1];
             emptytiles--;
-            if(numberedField[y][x + 1].equals("*")){
+            if (numberedField[y][x + 1].equals("*")) {
                 markremoval(x, y);
             }
             if (numberedField[y][x + 1].equals("/")) {
@@ -231,14 +230,13 @@ public class Board {
         if (x - 1 > 0 && playingField[y][x - 1].matches("[-]|[*]")) {
             playingField[y][x - 1] = numberedField[y][x - 1];
             emptytiles--;
-            if(numberedField[y][x - 1].equals("*")){
+            if (numberedField[y][x - 1].equals("*")) {
                 markremoval(x, y);
             }
             if (numberedField[y][x - 1].equals("/")) {
                 proxy(x - 1, y);
             }
         }
-
     }
 
     private void goingRight(int x, int y) {
@@ -290,96 +288,93 @@ public class Board {
             playingField[y][x] = numberedField[y][x];
             emptytiles--;
             if (isInteger(numberedField[y][x])) {
-                cornerCasesforX(x, y);
-                    break;
-                }
-                proxy(x, y);
+                cornerCasesForX(x, y);
+                break;
             }
+            proxy(x, y);
         }
-
-        private void goingDown ( int x, int y){
-            while (y < numberedField.length - 1) {
-                y++;
-                if (playingField[y][x].equals("/")) break;
-                if (playingField[y][x].equals("*")) {
-                    markremoval(x, y);
-                }
-                if (isInteger(playingField[y][x])) emptytiles++;
-                playingField[y][x] = numberedField[y][x];
-                emptytiles--;
-                if (isInteger(numberedField[y][x])) {
-                    cornerCasesforX(x, y);
-                    break;
-                }
-                proxy(x, y);
-            }
-        }
-
-        private void markremoval ( int x, int y){
-            if (numberedField[y][x].equals("X")) {
-                minesFound--;
-            } else {
-                fakeFound--;
-            }
-        }
-
-        protected void gameOver () {
-            for (Coordinates minePlacement : minePlacements) {
-                playingField[minePlacement.getX()][minePlacement.getY()] = "X";
-            }
-            drawBoard();
-        }
-
-        protected boolean winConditionCheck () {
-            if (emptytiles == 0) return true;
-            return fakeFound == 0 && minesFound == minePlacements.length;
-        }
-
-        private void firstExplore(int x, int y){
-            Random rand = new Random();
-            int mines = this.mines;
-            this.minePlacements = new Coordinates[mines];
-            int brojac = 0;
-            emptytiles -= mines;
-
-            Collection<Coordinates> alreadyChosenCoord = new HashSet<>();
-            alreadyChosenCoord.add(new Coordinates(x, y));
-
-            while (mines != 0) {
-
-                Coordinates cd = getNextUnusedCoord(rand, alreadyChosenCoord);
-
-                if (!numberedField[cd.getY()][cd.getX()].equals("X")){
-                    if(cd.getY() != y || cd.getX() != x) {
-                        minePlacements[brojac] = new Coordinates(cd.getY(), cd.getX());
-                        this.numberedField[cd.getY()][cd.getX()] = "X";
-
-                        if (playingField[cd.getY()][cd.getX()].equals("*")) {
-                            minesFound++;
-                            fakeFound--;
-                        }
-                        mines--;
-                        brojac++;
-
-                    }
-                }
-            }
-            addingMarkers(this.numberedField, minePlacements);
-        }
-
-        private Coordinates getNextUnusedCoord(Random rand, Collection<Coordinates> alreadyChosenCoord){
-            int i = 0;
-            int j = 0;
-
-            boolean unique = false;
-            while(!unique){
-                i = rand.nextInt(playingField.length);
-                j = rand.nextInt(playingField.length);
-                unique = !alreadyChosenCoord.contains(new Coordinates(i, j));
-            }
-            alreadyChosenCoord.add(new Coordinates(i, j));
-
-            return new Coordinates(i, j);
-        }
-
     }
+
+    private void goingDown(int x, int y) {
+        while (y < numberedField.length - 1) {
+            y++;
+            if (playingField[y][x].equals("/")) break;
+            if (playingField[y][x].equals("*")) {
+                markremoval(x, y);
+            }
+            if (isInteger(playingField[y][x])) emptytiles++;
+            playingField[y][x] = numberedField[y][x];
+            emptytiles--;
+            if (isInteger(numberedField[y][x])) {
+                cornerCasesForX(x, y);
+                break;
+            }
+            proxy(x, y);
+        }
+    }
+
+    private void markremoval(int x, int y) {
+        if (numberedField[y][x].equals("X")) {
+            minesFound--;
+        } else {
+            fakeFound--;
+        }
+    }
+
+    protected void gameOver() {
+        for (Coordinates minePlacement : minePlacements) {
+            playingField[minePlacement.getX()][minePlacement.getY()] = "X";
+        }
+        drawBoard();
+    }
+
+    protected boolean winConditionCheck() {
+        if (emptytiles == 0) return true;
+        return fakeFound == 0 && minesFound == minePlacements.length;
+    }
+
+    private void firstExplore(int x, int y) {
+        Random rand = new Random();
+        int mines = this.mines;
+        int brojac = 0;
+        emptytiles -= mines;
+        Collection<Coordinates> alreadyChosenCoord = new HashSet<>();
+        alreadyChosenCoord.add(new Coordinates(x, y));
+
+        while (mines != 0) {
+            Coordinates cd = getNextUnusedCoord(rand, alreadyChosenCoord);
+
+            if (!numberedField[cd.getY()][cd.getX()].equals("X")) {
+                if (cd.getY() != y || cd.getX() != x) {
+                    minePlacements[brojac] = new Coordinates(cd.getY(), cd.getX());
+                    this.numberedField[cd.getY()][cd.getX()] = "X";
+
+                    if (playingField[cd.getY()][cd.getX()].equals("*")) {
+                        minesFound++;
+                        fakeFound--;
+                    }
+                    mines--;
+                    brojac++;
+
+                }
+            }
+        }
+        addingMarkers(this.numberedField, minePlacements);
+    }
+
+    private Coordinates getNextUnusedCoord(Random rand, Collection<Coordinates> alreadyChosenCoord) {
+        int i = 0;
+        int j = 0;
+
+        boolean unique = false;
+        while (!unique) {
+            i = rand.nextInt(playingField.length);
+            j = rand.nextInt(playingField.length);
+            unique = !alreadyChosenCoord.contains(new Coordinates(i, j));
+        }
+        alreadyChosenCoord.add(new Coordinates(i, j));
+
+        return new Coordinates(i, j);
+    }
+
+}

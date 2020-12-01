@@ -13,4 +13,4 @@
 9| ///////// ||
 ||===========||
 </pre>
-Personal small project where I recreated the game "Minesweeper".
+Personal small project recreating the game "Minesweeper" on a 9x9 field with player inputted number of mines.
