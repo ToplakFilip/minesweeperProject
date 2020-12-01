@@ -54,7 +54,7 @@ public class UI {
         while(true){
             System.out.println("[ HOW MANY MINES ON THE FIELD ? ]");
             String input = scan.nextLine();
-            if(!input.matches("[1-9]||[1-9][1-9]")){
+            if(!input.matches("[1-9]|[1-9][0-9]")){
                 System.out.println("[ INPUT IS NOT A NUMBER ]");
             } else {
                 int broj = Integer.parseInt(input);

@@ -16,4 +16,21 @@ public class Coordinates {
     public int getY() {
         return this.y;
     }
+
+
+    public boolean equals(Object compared) {
+
+        if (compared == this) {
+            return true;
+        }
+
+        if (!(compared instanceof Coordinates)) {
+            return false;
+        }
+
+        Coordinates c = (Coordinates) compared;
+
+        return x == c.x
+                && y == c.y;
+    }
 }
